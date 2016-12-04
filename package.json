@@ -1,0 +1,36 @@
+{
+  "name": "@af-modules/compiler",
+  "version": "1.0.0",
+  "description": "",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/TitanNanoDE/af-compiler.git"
+  },
+  "keywords": [
+    "application-frame",
+    "compiler",
+    "gulp"
+  ],
+  "author": "Jovan Gerodetti (TitanNano)",
+  "license": " CC-BY-SA-4.0",
+  "bugs": {
+    "url": "https://github.com/TitanNanoDE/af-compiler/issues"
+  },
+  "homepage": "https://github.com/TitanNanoDE/af-compiler#readme",
+  "dependencies": {
+    "application-frame": "^0.3.0",
+    "colors": "^1.1.2",
+    "css-loader": "^0.26.1",
+    "dependency-tree": "^5.7.1",
+    "extract-text-webpack-plugin": "^2.0.0-beta.4",
+    "mkdirp": "^0.5.1",
+    "source-map-loader": "^0.1.5",
+    "style-loader": "^0.13.1",
+    "through2": "^2.0.3",
+    "webpack": "^2.1.0-beta.27"
+  }
+}

@@ -1,0 +1,28 @@
+.main {
+
+}
+
+body {
+    .rules {
+        border: 1px solid white;
+    }
+
+    margin: 3px;
+    font-size: 50px;
+    color: brown;
+}
+
+div {
+    height: 10px;
+
+    .taler {
+        height: 23px;
+    }
+
+    .fun {
+        padding: 10px;
+        .more {
+            width: 100px;
+        }
+    }
+}
