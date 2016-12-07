@@ -16,7 +16,7 @@ const link = function(webpackConfig) {
     }, {
         test: /\.css$/,
         loader: ExtractTextPlugin.extract({
-            loader: 'css-loader?sourceMaps',
+            loader: 'css-loader?sourceMaps,-url',
             fallbackLoader: 'style-loader',
         })
     }];
