@@ -19,6 +19,9 @@ const link = function(webpackConfig) {
             loader: 'css-loader?sourceMaps,-url',
             fallbackLoader: 'style-loader',
         })
+    }, {
+        test: /\.json$/,
+        use: 'json-loader',
     }];
 
     webpackConfig.plugins = [

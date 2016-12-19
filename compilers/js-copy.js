@@ -4,7 +4,7 @@ const Fs = require('fs');
 
 module.exports = {
     copy: true,
-    test: /\.(js|css|html)$/,
+    test: /\.(js|css|html|json)$/,
     execute: function(file, context, output) {
         output = Path.resolve(output, Path.relative(context, file));
 
