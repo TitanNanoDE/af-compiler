@@ -1,4 +1,4 @@
-#AF Compiler
+#AF Compiler [![Codacy Badge](https://api.codacy.com/project/badge/Grade/f55cc2a453454dfbaf4fd8b62f82b2a3)](https://www.codacy.com/app/TitanNanoDE/af-compiler?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=TitanNanoDE/af-compiler&amp;utm_campaign=Badge_Grade)
 
 This compiler compiles any project that targets a JavaScript runtime. 
 Other files than source code, like sass or less, can also be required and compiled in your project, even though it's not recommended.
