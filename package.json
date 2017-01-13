@@ -23,7 +23,7 @@
   },
   "homepage": "https://github.com/TitanNanoDE/af-compiler#readme",
   "dependencies": {
-    "application-frame": "^0.4.0",
+    "application-frame": "^0.5.0",
     "colors": "^1.1.2",
     "css-loader": "^0.26.1",
     "dependency-tree": "^5.7.1",
