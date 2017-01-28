@@ -2,6 +2,7 @@ const Colors = require('colors');
 const Fs = require('fs');
 const Path = require('path');
 const Copy = require('./compilers/js-copy');
+const Glob = require('glob');
 
 /**
  * @name CompilerInfo
@@ -23,12 +24,13 @@ const Copy = require('./compilers/js-copy');
  *
  * @return {[type]}           [description]
  */
-let analyze = function(entryFile, root, extensions = ['.js']) {
+const analyze = function(entryFile) {
     const normalIncludes = /(?!\/\/)[^\/]*import(?:[ ]+[a-zA-Z0-9_\$]*[ ]+from)?[ ]+(?:'([^']+)'|"([^"]+)")(?:$|;(?:[^"$;]*"[^";$]*"|[^'$;]*'[^';$]*')*[^"'$;]*$)/gm;
     const advancedIncludes = /(?!\/\/)[^\/]*import[ ]+(?:{(?:[^"'}]|"[^"}]*"|'[^'}]*')*}(?:[ ]+as[ ]+[a-zA-Z0-9_\$]+)?|\*[ ]+as[ ]+[a-zA-Z0-9_\$]+)[ ]+from[ ]+(?:'|")([^'"]*)(?:'|")(?:$|;(?=(?:(?:[^"$;]*"[^";$]*")|([^'$;]*'[^';$]*'))*[^"$;]*$))/gm;
     const requires = /(?!\/\/)[^\/]*require\((?:"([^"]*)"|'([^']*)')\)(?=(?:[^"$]*"[^"$]*"|[^'$]*'[^"$]*')*[^"'$]*$)/gm;
+    const reExports = /^\s*export .* from (?:"|')([^"']*)(?:'|")/gm;
 
-    const patterns = [normalIncludes, advancedIncludes, requires];
+    const patterns = [normalIncludes, advancedIncludes, requires, reExports];
 
     let includes = [];
     let queue = [entryFile];
@@ -37,16 +39,8 @@ let analyze = function(entryFile, root, extensions = ['.js']) {
         let path = queue.shift();
         let file = null;
 
-        if (Path.extname(path) === '') {
-            for (let i = 0; i < extensions.length; i++) {
-                if (Fs.existsSync(path + extensions[i])) {
-                    path = path + extensions[i];
-                    break;
-                }
-            }
-        }
-
         try {
+            path = require.resolve(path);
             file = Fs.readFileSync(path, 'utf8');
         } catch (e) {
             file = null;
@@ -84,7 +78,7 @@ let analyze = function(entryFile, root, extensions = ['.js']) {
     return includes;
 };
 
-let compilers = {
+const compilers = {
     'typescript': './compilers/ts-compiler',
     'sass': './compilers/sass-compiler',
 };
@@ -97,7 +91,7 @@ let compilers = {
  *
  * @return {[type]}           [description]
  */
-let compileFile = function(fileName, { compilers, moduleName, output, context}) {
+const compileFile = function(fileName, { compilers, moduleName, output, context}) {
     let compiled = false;
 
     compilers.forEach((compiler) => {
@@ -124,12 +118,12 @@ let compileFile = function(fileName, { compilers, moduleName, output, context}) 
     return true;
 };
 
-let compiler = function({ moduleName, entryFile, context, output, compilerList = [], extensions }) {
+const compiler = function({ moduleName, entryFile, context, output, compilerList = [], extensions }) {
 
     context = Path.resolve(context);
     entryFile = Path.resolve(entryFile);
 
-    let compilerConfig = {
+    const compilerConfig = {
         moduleName: moduleName,
         context: context,
         output: output,
@@ -142,7 +136,14 @@ let compiler = function({ moduleName, entryFile, context, output, compilerList =
         }),
     };
 
-    let sourceFiles = analyze(entryFile, context, extensions);
+    const sourceFiles = analyze(entryFile, context, extensions);
+    const packageFiles = Glob.sync(`${context}/**/package.json`);
+
+    packageFiles.forEach((path) => {
+        Copy.execute(path, context, output);
+
+        console.log(Colors.green('Include Package:'), path);
+    });
 
     sourceFiles.forEach(fileName => compileFile(fileName, compilerConfig));
 };
