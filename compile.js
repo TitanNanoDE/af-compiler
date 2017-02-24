@@ -96,9 +96,12 @@ const compileFile = function(fileName, { compilers, moduleName, output, context}
 
     compilers.forEach((compiler) => {
         if (fileName.search(compiler.test) > 0) {
-            console.log(Colors.green(`Compile ${compiler.name}:`), `${moduleName} <= ${fileName}`);
+            const result = compiler.execute(fileName, context, output);
 
-            compiler.execute(fileName, context, output);
+            if (result) {
+                console.log(Colors.green(`Compile ${compiler.name}:`), `${moduleName} <= ${fileName}`);
+            }
+
             compiled = true;
         }
     });
@@ -106,8 +109,11 @@ const compileFile = function(fileName, { compilers, moduleName, output, context}
     if (!compiled) {
 
         if (fileName.search(Copy.test) > 0) {
-            Copy.execute(fileName, context, output);
-            console.log(Colors.green('Copy:'), `${moduleName} <= ${fileName}`);
+            const result = Copy.execute(fileName, context, output);
+
+            if (result) {
+                console.log(Colors.green('Copy:'), `${moduleName} <= ${fileName}`);
+            }
 
         } else {
             console.error(Colors.red(`Faild to compile ${fileName}: No matching compiler!`));

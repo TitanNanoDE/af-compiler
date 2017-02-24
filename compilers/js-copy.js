@@ -6,11 +6,18 @@ module.exports = {
     copy: true,
     test: /\.(js|css|html|json)$/,
     execute: function(file, context, output) {
-        output = Path.resolve(output, Path.relative(context, file));
+        const relativePath = Path.relative(context, file);
 
-        mkdirp.sync(Path.dirname(output));
+        // simply skip modules which are out of context
+        if (/^\.\.\//.test(relativePath)) {
+            return false;
+        }
 
-        Fs.createReadStream(file).pipe(Fs.createWriteStream(output));
+        const target = Path.resolve(output, relativePath);
+
+        mkdirp.sync(Path.dirname(target));
+
+        Fs.createReadStream(file).pipe(Fs.createWriteStream(target));
 
         return true;
     }
