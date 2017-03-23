@@ -24,7 +24,7 @@
   "homepage": "https://github.com/TitanNanoDE/af-compiler#readme",
   "dependencies": {
     "colors": "^1.1.2",
-    "css-loader": "^0.26.1",
+    "css-loader": "^0.27.0",
     "extract-text-webpack-plugin": "^2.0.0-beta.4",
     "glob": "^7.1.1",
     "json-loader": "^0.5.4",
