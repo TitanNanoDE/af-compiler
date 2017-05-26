@@ -24,7 +24,7 @@ const Glob = require('glob');
  *
  * @return {[type]}           [description]
  */
-const analyze = function(entryFile) {
+const analyze = function(entryFile, context, extensions) {
     const normalIncludes = /(?!\/\/)[^\/]*import(?:[ ]+[a-zA-Z0-9_\$]*[ ]+from)?[ ]+(?:'([^']+)'|"([^"]+)")(?:$|;(?:[^"$;]*"[^";$]*"|[^'$;]*'[^';$]*')*[^"'$;]*$)/gm;
     const advancedIncludes = /(?!\/\/)[^\/]*import[ ]+(?:{(?:[^"'}]|"[^"}]*"|'[^'}]*')*}(?:[ ]+as[ ]+[a-zA-Z0-9_\$]+)?|\*[ ]+as[ ]+[a-zA-Z0-9_\$]+)[ ]+from[ ]+(?:'|")([^'"]*)(?:'|")(?:$|;(?=(?:(?:[^"$;]*"[^";$]*")|([^'$;]*'[^';$]*'))*[^"$;]*$))/gm;
     const requires = /(?!\/\/)[^\/]*require\((?:"([^"]*)"|'([^']*)')\)(?=(?:[^"$]*"[^"$]*"|[^'$]*'[^"$]*')*[^"'$]*$)/gm;
@@ -39,11 +39,19 @@ const analyze = function(entryFile) {
         let path = queue.shift();
         let file = null;
 
-        try {
-            path = require.resolve(path);
-            file = Fs.readFileSync(path, 'utf8');
-        } catch (e) {
-            file = null;
+        const possibleFiles = extensions.map(extension => `${path}${extension}`);
+        possibleFiles.unshift(path);
+
+        for (let i = 0; i < possibleFiles.length; i++) {
+            let path = possibleFiles[i];
+
+            try {
+                path = require.resolve(path);
+                file = Fs.readFileSync(path, 'utf8');
+                break;
+            } catch (e) {
+                file = null;
+            }
         }
 
         if (file !== null) {
@@ -62,8 +70,6 @@ const analyze = function(entryFile) {
                     if (dependency.search(/^\.\.?\//) > -1) {
                         dependency = Path.resolve(Path.dirname(path), dependency);
                     }
-
-                    console.log('found include:', dependency);
 
                     if (includes.indexOf(dependency) < 0 && queue.indexOf(dependency) < 0) {
                         queue.push(dependency);
@@ -107,7 +113,6 @@ const compileFile = function(fileName, { compilers, moduleName, output, context}
     });
 
     if (!compiled) {
-
         if (fileName.search(Copy.test) > 0) {
             const result = Copy.execute(fileName, context, output);
 

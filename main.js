@@ -11,7 +11,7 @@ module.exports = function({ cacheDir, compilers, extensions, linkExtensions, out
         context = context || Path.dirname(entry);
         compileCache = Path.resolve(cacheDir, `./${Path.basename(context)}`);
 
-        const startCompileProcess = function() {
+        const startCompileProcess = function(linkParalel = false) {
             let compilerConfig = {
                 output: compileCache,
                 moduleName: module,
@@ -26,6 +26,7 @@ module.exports = function({ cacheDir, compilers, extensions, linkExtensions, out
                 entry: { [module]: Path.resolve(compileCache, Path.relative(context, Path.resolve(entry))) },
                 devtool: 'source-map',
                 target: target,
+                paralelLinking: linkParalel,
                 output: {
                     pathinfo: true,
                     path: Path.resolve(outDir),
@@ -46,7 +47,7 @@ module.exports = function({ cacheDir, compilers, extensions, linkExtensions, out
         } else {
             return Through.obj(function (file, encoding, callback) {
                 entry = file.path;
-                startCompileProcess().then(callback);
+                startCompileProcess(true).then(callback);
 
                 this.push(file);
                 return true;

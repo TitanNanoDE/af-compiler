@@ -6,7 +6,9 @@ const ExtractTextPlugin = require('extract-text-webpack-plugin');
 
 const link = function(webpackConfig) {
     let progressVisibile = false;
+    const { paralelLinking } = webpackConfig;
 
+    delete webpackConfig.paralelLinking;
     webpackConfig.module = webpackConfig.module || {};
 
     webpackConfig.module.rules = [{
@@ -30,24 +32,30 @@ const link = function(webpackConfig) {
 
     let linker = Webpack(webpackConfig);
 
-    linker.apply(new ProgressPlugin(function(percentage, msg) {
-        const pLength = 40;
-        let progress = new Array(Math.round(percentage * pLength) + 1);
-        let pOffset = new Array(pLength - Math.round(percentage * pLength) + 1);
-
+    linker.apply(new ProgressPlugin(function(percentage, msg, modules, active, name) {
         if (progressVisibile) {
             process.stdout.clearLine();
             process.stdout.cursorTo(0);
         }
 
-        process.stdout.write(Colors.green('Link Webpack: ') +
-            `${Object.keys(webpackConfig.entry)[0]} ${Math.round(percentage * 100)}% [${progress.join('=')}>${pOffset.join(' ')}] ${msg}`);
-        progressVisibile = true;
+        name = name && name.split('!').pop() || msg;
+
+        const state = Colors.green('Link Webpack: ') +
+            `[${Math.round(percentage * 100)}%] ${Object.keys(webpackConfig.entry)[0]} <= ${name}`;
+
+        if (name) {
+            if (!paralelLinking) {
+                progressVisibile = true;
+                process.stdout.write(state);
+            } else {
+                console.log(state);
+            }
+        }
     }));
 
     return new Promise((success) => {
         linker.run((errors, stats) => {
-            errors || console.error(Colors.red(errors));
+            errors && console.error(Colors.red(errors));
 
             stats.compilation.errors.forEach((error) => console.error(Colors.green('Webpack:'), Colors.red(error.message)));
             stats.compilation.warnings.forEach(warning => console.warn(Colors.green('Webpack:'), Colors.red(warning.message)));
