@@ -33,6 +33,6 @@
     "source-map-loader": "^0.2.0",
     "style-loader": "^0.18.0",
     "through2": "^2.0.3",
-    "webpack": "^2.2.1"
+    "webpack": "^3.0.0"
   }
 }
