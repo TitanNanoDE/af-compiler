@@ -43,7 +43,7 @@ const analyze = function(entryFile, context, extensions) {
         possibleFiles.unshift(path);
 
         for (let i = 0; i < possibleFiles.length; i++) {
-            let path = possibleFiles[i];
+            path = possibleFiles[i];
 
             try {
                 path = require.resolve(path);
@@ -100,12 +100,14 @@ const compilers = {
 const compileFile = function(fileName, { compilers, moduleName, output, context}) {
     let compiled = false;
 
-    compilers.forEach((compiler) => {
+    compilers.some((compiler) => {
         if (fileName.search(compiler.test) > 0) {
+            console.log(Colors.green(`Compile ${compiler.name}:`), `${moduleName} <= ${fileName}`);
+
             const result = compiler.execute(fileName, context, output);
 
-            if (result) {
-                console.log(Colors.green(`Compile ${compiler.name}:`), `${moduleName} <= ${fileName}`);
+            if (!result) {
+                console.log(Colors.red(`Failded to compile ${fileName}`));
             }
 
             compiled = true;
@@ -114,12 +116,13 @@ const compileFile = function(fileName, { compilers, moduleName, output, context}
 
     if (!compiled) {
         if (fileName.search(Copy.test) > 0) {
+            console.log(Colors.green('Copy:'), `${moduleName} <= ${fileName}`);
+
             const result = Copy.execute(fileName, context, output);
 
-            if (result) {
-                console.log(Colors.green('Copy:'), `${moduleName} <= ${fileName}`);
+            if (!result) {
+                console.log(`Failed to copy file ${fileName}`);
             }
-
         } else {
             console.error(Colors.red(`Faild to compile ${fileName}: No matching compiler!`));
             return false;

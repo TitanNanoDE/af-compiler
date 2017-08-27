@@ -3,9 +3,10 @@ const Compiler = require('./main');
 const entryFile = './test-data/main.js';
 
 const compiler = Compiler({
-    compilers: ['sass'],
+    compilers: ['sass', 'typescript'],
     outDir: './dist/',
     extensions: ['.js', '.ts', '.scss', '.css'],
+    linkExtensions: ['.js', '.css'],
     cacheDir: './.caches/',
 });
 

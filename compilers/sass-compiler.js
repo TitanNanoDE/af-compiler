@@ -19,9 +19,9 @@ const compile = function(file, context, output) {
         file: file,
         sourceMap: true,
         outFile: output,
-//        sourceMapRoot: context,
+//        sourceMapRoot: Path.relative(output, Path.dirname(file)),
     };
-    
+
     let result = Sass.renderSync(options);
 
     try {

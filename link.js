@@ -17,9 +17,9 @@ const link = function(webpackConfig) {
         use: 'source-map-loader'
     }, {
         test: /\.css$/,
-        loader: ExtractTextPlugin.extract({
-            loader: 'css-loader?sourceMaps,-url',
-            fallbackLoader: 'style-loader',
+        use: ExtractTextPlugin.extract({
+            use: 'css-loader?sourceMaps,-url',
+            fallback: 'style-loader',
         })
     }, {
         test: /\.json$/,
@@ -30,7 +30,7 @@ const link = function(webpackConfig) {
         new ExtractTextPlugin('[name].css'),
     ];
 
-    let linker = Webpack(webpackConfig);
+    const linker = Webpack(webpackConfig);
 
     linker.apply(new ProgressPlugin(function(percentage, msg, modules, active, name) {
         if (progressVisibile) {
@@ -58,7 +58,7 @@ const link = function(webpackConfig) {
             errors && console.error(Colors.red(errors));
 
             stats.compilation.errors.forEach((error) => console.error(Colors.green('Webpack:'), Colors.red(error.message)));
-            stats.compilation.warnings.forEach(warning => console.warn(Colors.green('Webpack:'), Colors.red(warning.message)));
+            stats.compilation.warnings.forEach(warning => console.warn(Colors.green('Webpack:'), Colors.yellow(warning.message)));
 
             Object.keys(stats.compilation.assets).forEach(asset =>
                 console.log(Colors.cyan(`Install Webpack: ${Path.resolve(webpackConfig.output.path, asset)}`))

@@ -11,13 +11,14 @@ const ts = require('typescript');
  */
 const compile = function(file, context, output) {
     let options = {
-        sourceMaps: true,
-        sourceRoot: context,
+        sourceMap: true,
+//        sourceRoot: path.relative(output, path.dirname(file)),
         target: 'ES2015',
         outDir: output,
+        allowJs: true,
     };
 
-    let program = ts.createProgram(file, options);
+    let program = ts.createProgram([file], options);
     let emitResult = program.emit();
 
     let allDiagnostics = ts.getPreEmitDiagnostics(program).concat(emitResult.diagnostics);
@@ -28,7 +29,7 @@ const compile = function(file, context, output) {
         console.log(`${diagnostic.file.fileName} (${line + 1},${character + 1}): ${message}`);
     });
 
-    return emitResult.emitSkipped;
+    return !emitResult.emitSkipped;
 };
 
 
