@@ -47,7 +47,9 @@ module.exports = function({ cacheDir, compilers, extensions, linkExtensions, out
         } else {
             return Through.obj(function (file, encoding, callback) {
                 entry = file.path;
-                startCompileProcess(true).then(callback);
+                startCompileProcess(true)
+                    .then(callback)
+                    .catch(() => callback(new Error('Compilation Failed!')));
 
                 this.push(file);
                 return true;

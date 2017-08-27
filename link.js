@@ -64,12 +64,16 @@ const link = function(webpackConfig) {
         }
     }));
 
-    return new Promise((success) => {
+    return new Promise((success, failure) => {
         linker.run((errors, stats) => {
             errors && console.error(Colors.red(errors));
 
-            stats.compilation.errors.forEach((error) => console.error(Colors.green('Webpack:'), Colors.red(error.message)));
             stats.compilation.warnings.forEach(warning => console.warn(Colors.green('Webpack:'), Colors.yellow(warning.message)));
+
+            if (stats.compilation.errors.length > 0) {
+                stats.compilation.errors.forEach((error) => console.error(Colors.green('Webpack:'), Colors.red(error.message)));
+                failure();
+            }
 
             Object.keys(stats.compilation.assets).forEach(asset =>
                 console.log(Colors.cyan(`Install Webpack: ${Path.resolve(webpackConfig.output.path, asset)}`))
