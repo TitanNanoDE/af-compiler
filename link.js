@@ -31,6 +31,7 @@ const link = function(webpackConfig) {
     ];
 
     const linker = Webpack(webpackConfig);
+    let lastLinkerOut = '';
 
     linker.apply(new ProgressPlugin(function(percentage, msg, modules, active, name) {
         if (progressVisibile) {
@@ -40,10 +41,20 @@ const link = function(webpackConfig) {
 
         name = name && name.split('!').pop() || msg;
 
+        if (name === 'building modules') {
+            return;
+        }
+
+        if (name === lastLinkerOut) {
+            return;
+        }
+
         const state = Colors.green('Link Webpack: ') +
             `[${Math.round(percentage * 100)}%] ${Object.keys(webpackConfig.entry)[0]} <= ${name}`;
 
         if (name) {
+            lastLinkerOut = name;
+
             if (!paralelLinking) {
                 progressVisibile = true;
                 process.stdout.write(state);
