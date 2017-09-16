@@ -39,16 +39,17 @@ const analyze = function(entryFile, context, extensions) {
     while (queue.length > 0) {
         let path = queue.shift();
         let file = null;
+        let actualFilePath = null;
 
         const possibleFiles = extensions.map(extension => `${path}${extension}`);
         possibleFiles.unshift(path);
 
         for (let i = 0; i < possibleFiles.length; i++) {
-            path = possibleFiles[i];
+            actualFilePath = possibleFiles[i];
 
             try {
-                path = require.resolve(path);
-                file = Fs.readFileSync(path, 'utf8');
+                actualFilePath = require.resolve(actualFilePath);
+                file = Fs.readFileSync(actualFilePath, 'utf8');
                 break;
             } catch (e) {
                 file = null;
@@ -56,9 +57,11 @@ const analyze = function(entryFile, context, extensions) {
         }
 
         if (file !== null) {
-            if (includes.indexOf(path) < 0) {
-                includes.push(path);
+            if (includes.indexOf(actualFilePath) > 0) {
+                continue;
             }
+
+            includes.push(actualFilePath);
 
             patterns.forEach(pattern => {
                 let result = null;
@@ -66,10 +69,8 @@ const analyze = function(entryFile, context, extensions) {
                 while ((result = pattern.exec(file))) {
                     let dependency = result[1] || result[2];
 
-                    path = Path.resolve(path);
-
                     if (dependency.search(/^\.\.?\//) > -1) {
-                        dependency = Path.resolve(Path.dirname(path), dependency);
+                        dependency = Path.resolve(Path.dirname(actualFilePath), dependency);
                     }
 
                     if (discovered.indexOf(dependency) < 0 && queue.indexOf(dependency) < 0) {
