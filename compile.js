@@ -32,8 +32,9 @@ const analyze = function(entryFile, context, extensions) {
 
     const patterns = [normalIncludes, advancedIncludes, requires, reExports];
 
-    let includes = [];
-    let queue = [entryFile];
+    const includes = [];
+    const discovered = [];
+    const queue = [entryFile];
 
     while (queue.length > 0) {
         let path = queue.shift();
@@ -71,8 +72,9 @@ const analyze = function(entryFile, context, extensions) {
                         dependency = Path.resolve(Path.dirname(path), dependency);
                     }
 
-                    if (includes.indexOf(dependency) < 0 && queue.indexOf(dependency) < 0) {
+                    if (discovered.indexOf(dependency) < 0 && queue.indexOf(dependency) < 0) {
                         queue.push(dependency);
+                        discovered.push(dependency);
                     }
                 }
             });
@@ -116,12 +118,10 @@ const compileFile = function(fileName, { compilers, moduleName, output, context}
 
     if (!compiled) {
         if (fileName.search(Copy.test) > 0) {
-            console.log(Colors.green('Copy:'), `${moduleName} <= ${fileName}`);
-
             const result = Copy.execute(fileName, context, output);
 
-            if (!result) {
-                console.log(`Failed to copy file ${fileName}`);
+            if (result) {
+                console.log(Colors.green('Copy:'), `${moduleName} <= ${fileName}`);
             }
         } else {
             console.error(Colors.red(`Faild to compile ${fileName}: No matching compiler!`));
